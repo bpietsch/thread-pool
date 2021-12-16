@@ -48,8 +48,8 @@ public:
      *
      * @param _thread_count The number of threads to use. The default value is the total number of hardware threads available, as reported by the implementation. With a hyperthreaded CPU, this will be twice the number of CPU cores. If the argument is zero, the default value will be used instead.
      */
-    thread_pool(const ui32 &_thread_count = std::thread::hardware_concurrency())
-        : thread_count(_thread_count ? _thread_count : std::thread::hardware_concurrency()), threads(new std::thread[_thread_count ? _thread_count : std::thread::hardware_concurrency()])
+    thread_pool(const ui32 &_thread_count )
+        : thread_count(_thread_count), threads(new std::thread[_thread_count])
     {
         create_threads();
     }
@@ -204,14 +204,14 @@ public:
      *
      * @param _thread_count The number of threads to use. The default value is the total number of hardware threads available, as reported by the implementation. With a hyperthreaded CPU, this will be twice the number of CPU cores. If the argument is zero, the default value will be used instead.
      */
-    void reset(const ui32 &_thread_count = std::thread::hardware_concurrency())
+    void reset(const ui32 &_thread_count)
     {
         const bool was_paused = paused;
         pause();
         wait_for_tasks();
         running = false;
         destroy_threads();
-        thread_count = _thread_count ? _thread_count : std::thread::hardware_concurrency();
+        thread_count = _thread_count;
         threads.reset(new std::thread[thread_count]);
         if (!was_paused) {
           resume();
